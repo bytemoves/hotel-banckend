@@ -13,6 +13,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	
 )
 
 
@@ -50,11 +51,11 @@ func main () {
 	app := fiber.New(config)
 	apiv1 := app.Group("/api/v1")
 
-
-
+	apiv1.Delete("/user/:id",userHandler.HandlePutUser)
+	apiv1.Delete("/user/:id",userHandler.HandleDeleteUser)
 	apiv1.Post("/user",userHandler.HandlePostUser)
 	apiv1.Get("/user",userHandler.HandleGetUser)
-	apiv1.Get("/user:id",userHandler.HandleGetUser)
+	apiv1.Get("/user/:id",userHandler.HandleGetUser)
 
 	app.Listen(*listenAddr)
 }

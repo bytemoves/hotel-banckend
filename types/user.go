@@ -1,6 +1,10 @@
 package types
 
 import (
+	"fmt"
+	"regexp"
+
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -8,9 +12,32 @@ import (
 
 const (
 	bcryptCost = 12
-	minFirstNameLen = 3
-	minLastNameLen = 3
+	minFirstNameLen = 2
+	minLastNameLen = 2
+	minPasswordLength = 7
 )
+
+type UpdateUserParams struct {
+	FirstName string `json:"firstName"`
+	LastName  string  `json:"lastName"`
+
+}
+
+func (p UpdateUserParams) ToBSON() bson.M{
+	m := bson.M{}
+	if len (p.FirstName) > 0{
+		m["FirstName"] = p.FirstName
+
+	}
+	if len (p.LastName) > 0{
+		m["LasrName"] = p.LastName
+
+	}
+	return m
+}
+
+
+
 
 type CreateUserParams struct{
 
@@ -21,10 +48,29 @@ type CreateUserParams struct{
 
 }
 
-func(params CreateUserParams) validate() error{
-
-	
+func(params CreateUserParams) Validate() map[string]string{
+	errors := map[string]string{}
+	if len(params.FirstName) < minFirstNameLen{
+		errors["firstname"]= fmt.Sprintf("first name lenght shoud be atleast %d characters",minFirstNameLen)
+	}
+	if len(params.LastName) < minLastNameLen{
+		errors["lastname"] = fmt.Sprintf("last name lenght shoud be atleast %d characters",minLastNameLen)
+	}
+	if len(params.Password) < minPasswordLength{
+		errors["password"] = fmt.Sprintf("password Lenght lenght shoud be atleast %d characters",minPasswordLength)
+	}
+	if !isEmailValid(params.Email){
+		errors["email"] = fmt.Sprintf("email is invalid")
+	}
+	return nil
 }
+
+
+func isEmailValid(e string) bool {
+    emailRegex := regexp.MustCompile(`^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$`)
+    return emailRegex.MatchString(e)
+}
+
 
 type User struct{
 	ID primitive.ObjectID `bson:"_id,omitempty" json:"id,omitempty"`

@@ -4,8 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
-	"io"
+	
 	"log"
 	"net/http/httptest"
 	"testing"
@@ -15,7 +14,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	// "google.golang.org/genproto/googleapis/cloud/aiplatform/v1/schema/predict/params"
+	
 )
 
 const (
@@ -71,6 +70,12 @@ func TestPostUser(t *testing.T) {
 	}
 	var user types.User
 	json.NewDecoder(resp.Body).Decode(&user)
+	if len (user.ID) == 0 {
+		t.Errorf("expecting a user id to be set ")
+	}
+	if len (user.EnctyptedPassword) > 0 {
+		t.Errorf("expecting the expected password not to be included in json response ")
+	}
 	if user.FirstName != params.FirstName{
 		t.Errorf("Expected First name %s but got %s",params.FirstName,user.FirstName)
 	}

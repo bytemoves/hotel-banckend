@@ -1,5 +1,5 @@
 # Hotel reservation backend
- hha nothing too crazy
+
 # Project environment variables
 ```
 HTTP_LISTEN_ADDRESS=:3000

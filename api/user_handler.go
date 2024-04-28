@@ -28,6 +28,8 @@ func NewUserHandler(userStore db.UserStore) *UserHandler {
 }
 
 
+
+
 func (h *UserHandler) HandlePutUser(c *fiber.Ctx) error{
 	var (
 		// values bson.E

@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	
 	"fmt"
-	
+	"time"
+
 	"os"
 
 	"github.com/gofiber/fiber/v2"
@@ -20,19 +20,26 @@ func JWTAuthentication (c *fiber.Ctx) error{
 	}
 
 
-	if err := parseToken(token[0]); err != nil{
+	claims ,  err := validateToken(token[0]);
+	if err != nil{
 		return err
 	}
-	
 
+	expiresFloat := claims["expires"].(float64)
+	expires := int64(expiresFloat)
+	//check token expiration
+	if time.Now().Unix() > expires {
+		return fmt.Errorf("token expired")
 
+	}
+	//fmt.Println(expires)
 	return nil
 
 }
 
 
 
-func parseToken (tokenStr string) error {
+func validateToken (tokenStr string) (jwt.MapClaims, error) {
 
 
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
@@ -49,15 +56,24 @@ func parseToken (tokenStr string) error {
 	if err != nil {
 
 		fmt.Println("failed to parse JWT token:", err)
-		return fmt.Errorf("unauthorized")
+		return nil ,fmt.Errorf("unauthorized")
 	}
+	  if !token.Valid {
+		fmt.Println("invalid token")
+		return nil ,fmt.Errorf("unauthorized")
+
+	  }
+	 claims, ok := token.Claims.(jwt.MapClaims)
+
+	 if !ok {
+		return nil , fmt.Errorf("unauthorized")
+	 }
 	
-	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		fmt.Println(claims)
-	} 
+	 return claims, nil
+	
+} 
 
 
-	return fmt.Errorf("unauthorized")
+	
 	
 
-}
